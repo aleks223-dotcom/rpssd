@@ -4,7 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RP Universe</title>
+<title>RP Universe</title> 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <style>
 :root {
   --bg:#10121b; --panel:#191d2a; --panel2:#222738;
@@ -287,6 +288,18 @@ function esc(s){
  return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 renderHome();renderRooms();renderCharacters();renderWorlds();
-</script>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = 'https://zjonahbhzrocqcnofqeg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_d78ZJLP3py5FmTixaatO4Q_EIujcoUH';
+
+const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+</script> 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
