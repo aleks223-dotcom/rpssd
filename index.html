@@ -6,7 +6,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RP Universe</title> 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <style>
 :root {
   --bg:#10121b; --panel:#191d2a; --panel2:#222738;
@@ -289,20 +288,26 @@ function esc(s){
  return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 renderHome();renderRooms();renderCharacters();renderWorlds();
- 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-  const SUPABASE_URL = 'https://zjonahbhzrocqcnofqeg.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_d78ZJLP3py5FmTixaatO4Q_EIujcoUH';
+ renderHome();
+renderRooms();
+renderCharacters();
+renderWorlds();
 
-const supabase = window.supabase.createClient(
+// Połączenie z Supabase
+const SUPABASE_URL = 'https://zjonahbhzrocqcnofqeg.supabase.co';
+
+// Wstaw tutaj swój klucz publishable
+const SUPABASE_KEY = 'TU_WSTAW_SWÓJ_KLUCZ';
+
+const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
+console.log('Supabase client utworzony:', !!supabaseClient);
 
+</script>
 
-</script> 
 
 </body>
 </html>
