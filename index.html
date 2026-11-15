@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RP Universe</title>
+<style>
+:root {
+  --bg:#10121b; --panel:#191d2a; --panel2:#222738;
+  --text:#f1eff8; --muted:#969bb0; --accent:#a78bfa;
+  --border:#30364a;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:Inter,system-ui,sans-serif;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:245px 1fr;min-height:100vh}
+aside{background:#151824;border-right:1px solid var(--border);padding:22px}
+.logo{font-size:21px;font-weight:800;margin-bottom:35px}
+.logo span{color:var(--accent)}
+.nav button{
+ display:block;width:100%;text-align:left;padding:12px;
+ margin:5px 0;border:0;border-radius:10px;
+ background:transparent;color:var(--muted)
+}
+.nav button.active,.nav button:hover{background:var(--panel2);color:white}
+main{padding:28px;min-width:0}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:30px}
+h1{font-size:26px;margin:0 0 8px}
+p{color:var(--muted)}
+button.primary{
+ background:var(--accent);color:#171323;border:0;
+ border-radius:10px;padding:11px 17px;font-weight:700
+}
+button.secondary{
+ background:var(--panel2);color:white;border:1px solid var(--border);
+ border-radius:9px;padding:9px 13px
+}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:18px}
+.card h3{margin-top:0}
+.muted{color:var(--muted);font-size:13px}
+.section{margin:28px 0}
+input,textarea,select{
+ width:100%;padding:12px;background:var(--bg);color:white;
+ border:1px solid var(--border);border-radius:9px;margin:7px 0 14px
+}
+textarea{resize:vertical;min-height:85px}
+label{font-size:13px;color:var(--muted)}
+.hidden{display:none!important}
+.chat{display:grid;grid-template-columns:1fr 250px;gap:15px}
+.chatbox{height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:15px}
+.message{padding:12px 14px;border-radius:12px;background:var(--panel2);max-width:85%;white-space:pre-wrap}
+.message.ai{border-left:3px solid var(--accent)}
+.message.me{align-self:flex-end;background:#353052}
+.message .who{font-size:12px;color:var(--accent);margin-bottom:5px}
+.composer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border)}
+.composer input{margin:0}
+.chat-side{display:flex;flex-direction:column;gap:12px}
+.pill{font-size:11px;color:var(--accent);background:#302844;padding:5px 9px;border-radius:20px}
+@media(max-width:750px){
+ .app{grid-template-columns:1fr}
+ aside{padding:12px;border-right:0;border-bottom:1px solid var(--border)}
+ .logo{margin:0 0 10px}
+ .nav{display:flex;overflow:auto}
+ .nav button{white-space:nowrap;width:auto}
+ main{padding:17px}
+ .chat{grid-template-columns:1fr}
+ .chatbox{height:48vh}
+ .chat-side{display:grid;grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+ <div class="logo">✦ RP <span>UNIVERSE</span></div>
+ <div class="nav">
+  <button class="active" onclick="page('home')" data-page="home">⌂ <span data-i="home">Strona główna</span></button>
+  <button onclick="page('rooms')" data-page="rooms">▤ <span data-i="rooms">Moje pokoje</span></button>
+  <button onclick="page('characters')" data-page="characters">♙ <span data-i="characters">Postacie</span></button>
+  <button onclick="page('worlds')" data-page="worlds">✧ <span data-i="worlds">Światy</span></button>
+  <button onclick="page('settings')" data-page="settings">⚙ <span data-i="settings">Ustawienia</span></button>
+ </div>
+</aside>
+
+<main>
+<header>
+ <div>
+  <h1 id="heading">Witaj w RP Universe ✦</h1>
+  <p id="subtitle">Stwórz świat. Zaproś drugiego gracza. Napiszcie historię.</p>
+ </div>
+ <button class="secondary" onclick="toggleLang()" id="lang">EN</button>
+</header>
+
+<section id="home">
+ <div class="grid">
+  <div class="card"><span class="pill">ROLEPLAY</span><h3>✧ Wspólne historie</h3><p class="muted">Dwoje graczy, własne postacie i jeden wspólny świat.</p></div>
+  <div class="card"><span class="pill">AI</span><h3>✦ Inteligentny narrator</h3><p class="muted">Narrator i wiele postaci niezależnych.</p></div>
+  <div class="card"><span class="pill">MEMORY</span><h3>▤ Pamięć fabuły</h3><p class="muted">Miejsce na historię i ważne wydarzenia.</p></div>
+ </div>
+ <div class="section">
+  <h2>Twoje RP</h2>
+  <div id="homeRooms" class="grid"></div>
+  <button class="primary" onclick="page('rooms')">＋ Utwórz nowy pokój</button>
+ </div>
+</section>
+
+<section id="rooms" class="hidden">
+ <h2>Moje pokoje</h2>
+ <div class="card">
+  <h3>Utwórz nową historię</h3>
+  <label>Nazwa pokoju</label><input id="roomName" placeholder="Np. Tajemnice akademii">
+  <label>Opis fabuły</label><textarea id="roomDesc" placeholder="Opisz początek historii..."></textarea>
+  <label>Tryb AI</label>
+  <select id="aiMode"><option value="both">Narrator + NPC</option><option value="narrator">Tylko narrator</option><option value="npc">Tylko NPC</option></select>
+  <button class="primary" onclick="createRoom()">Utwórz pokój</button>
+ </div>
+ <div class="section grid" id="roomList"></div>
+</section>
+
+<section id="characters" class="hidden">
+ <h2>Karty postaci</h2>
+ <div class="card">
+  <label>Imię postaci</label><input id="charName" placeholder="Imię">
+  <label>Właściciel</label><select id="charOwner"><option>Gracz 1</option><option>Gracz 2</option></select>
+  <label>Wygląd i osobowość</label><textarea id="charDesc" placeholder="Opis postaci..."></textarea>
+  <label>Historia postaci</label><textarea id="charHistory" placeholder="Przeszłość, motywacje, sekrety..."></textarea>
+  <button class="primary" onclick="createCharacter()">Zapisz postać</button>
+ </div>
+ <div class="section grid" id="characterList"></div>
+</section>
+
+<section id="worlds" class="hidden">
+ <h2>Twoje światy</h2>
+ <div class="card">
+  <label>Nazwa świata</label><input id="worldName" placeholder="Np. Królestwo cieni">
+  <label>Gatunek</label><select id="worldGenre"><option>Fantasy</option><option>Romance</option><option>Modern</option><option>Horror</option><option>Science Fiction</option><option>Historical</option><option>Other</option></select>
+  <label>Opis świata i zasady</label><textarea id="worldDesc" placeholder="Opisz uniwersum..."></textarea>
+  <button class="primary" onclick="createWorld()">Zapisz świat</button>
+ </div>
+ <div class="section grid" id="worldList"></div>
+</section>
+
+<section id="settings" class="hidden">
+ <h2>Ustawienia</h2>
+ <div class="card">
+  <h3>Język</h3><button class="secondary" onclick="toggleLang()">Zmień język PL / EN</button>
+  <h3>Osobowość AI</h3>
+  <label>Styl wypowiedzi</label>
+  <select id="aiPersonality"><option>Literacki i szczegółowy</option><option>Krótki i dynamiczny</option><option>Filmowy i dramatyczny</option><option>Naturalny i realistyczny</option><option>Mroczny i tajemniczy</option></select>
+  <label>Długość odpowiedzi</label>
+  <select id="aiLength"><option>Krótka</option><option>Średnia</option><option>Długa</option></select>
+  <label>Instrukcje AI</label><textarea id="aiRules" placeholder="Np. AI nigdy nie kontroluje postaci graczy."></textarea>
+  <button class="primary" onclick="saveSettings()">Zapisz ustawienia</button>
+ </div>
+ <div class="card section">
+  <h3>Połączenie AI</h3>
+  <p class="muted">W tej wersji odpowiedzi AI są demonstracyjne. Prawdziwe generowanie wymaga skonfigurowania bezpiecznego backendu i API modelu.</p>
+  <span class="pill">API: niepodłączone</span>
+ </div>
+</section>
+
+<section id="play" class="hidden">
+ <button class="secondary" onclick="page('rooms')">← Pokoje</button>
+ <h2 id="playTitle">Pokój RP</h2>
+ <p id="playDesc" class="muted"></p>
+ <div class="chat">
+  <div class="card" style="padding:0;min-width:0">
+   <div id="chatbox" class="chatbox"></div>
+   <div class="composer">
+    <input id="message" placeholder="Napisz jako Twoja postać..." onkeydown="if(event.key==='Enter')sendMessage()">
+    <button class="primary" onclick="sendMessage()">➤</button>
+   </div>
+  </div>
+  <div class="chat-side">
+   <div class="card"><h3>Gracze</h3><p class="muted">♙ Gracz 1</p><p class="muted">♙ Gracz 2</p></div>
+   <div class="card"><h3>Postacie AI</h3><div id="npcList" class="muted">Narrator</div></div>
+   <div class="card"><h3>Pamięć fabuły</h3><textarea id="memory" placeholder="Ważne wydarzenia, relacje, sekrety..."></textarea><button class="secondary" onclick="saveMemory()">Zapisz pamięć</button></div>
+   <div class="card"><h3>Własny NPC</h3><input id="npcName" placeholder="Imię NPC"><textarea id="npcDesc" placeholder="Osobowość i rola"></textarea><button class="secondary" onclick="addNPC()">Dodaj NPC</button></div>
+   <div class="card"><h3>Tura AI</h3><button class="primary" style="width:100%" onclick="aiTurn()">✦ Tura AI</button><p class="muted">Tryb demonstracyjny</p></div>
+  </div>
+ </div>
+</section>
+</main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let data=JSON.parse(localStorage.getItem('rpUniverse')||'{"rooms":[],"characters":[],"worlds":[],"settings":{},"lang":"pl"}');
+let activeRoom=null;
+let lang=data.lang||'pl';
+
+const translations={
+ pl:{home:'Strona główna',rooms:'Moje pokoje',characters:'Postacie',worlds:'Światy',settings:'Ustawienia'},
+ en:{home:'Home',rooms:'My rooms',characters:'Characters',worlds:'Worlds',settings:'Settings'}
+};
+function persist(){localStorage.setItem('rpUniverse',JSON.stringify(data))}
+function toggleLang(){
+ lang=lang==='pl'?'en':'pl';data.lang=lang;persist();
+ document.querySelectorAll('[data-i]').forEach(e=>e.textContent=translations[lang][e.dataset.i]);
+ $('lang').textContent=lang==='pl'?'EN':'PL';
+}
+function page(id){
+ ['home','rooms','characters','worlds','settings','play'].forEach(x=>$(x).classList.toggle('hidden',x!==id));
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+ if(id==='rooms')renderRooms();
+ if(id==='characters')renderCharacters();
+ if(id==='worlds')renderWorlds();
+ if(id==='home')renderHome();
+}
+function createRoom(){
+ const name=$('roomName').value.trim();if(!name)return alert('Podaj nazwę pokoju');
+ const room={id:Date.now(),name,desc:$('roomDesc').value,mode:$('aiMode').value,messages:[],npcs:[],memory:''};
+ data.rooms.push(room);persist();$('roomName').value='';$('roomDesc').value='';renderRooms();renderHome();
+}
+function renderRooms(){
+ $('roomList').innerHTML=data.rooms.map(r=>`<div class="card"><h3>${esc(r.name)}</h3><p class="muted">${esc(r.desc)}</p><button class="primary" onclick="openRoom(${r.id})">Otwórz RP</button> <button class="secondary" onclick="deleteRoom(${r.id})">Usuń</button></div>`).join('')||'<p class="muted">Brak pokoi. Utwórz pierwszy!</p>';
+}
+function renderHome(){
+ $('homeRooms').innerHTML=data.rooms.slice(-3).map(r=>`<div class="card"><h3>${esc(r.name)}</h3><button class="secondary" onclick="openRoom(${r.id})">Otwórz</button></div>`).join('')||'<p class="muted">Twoja historia zaczyna się tutaj.</p>';
+}
+function deleteRoom(id){data.rooms=data.rooms.filter(r=>r.id!==id);persist();renderRooms();renderHome()}
+function openRoom(id){
+ activeRoom=data.rooms.find(r=>r.id===id);if(!activeRoom)return;
+ $('playTitle').textContent=activeRoom.name;$('playDesc').textContent=activeRoom.desc;
+ $('memory').value=activeRoom.memory||'';renderChat();renderNPC();
+ page('play');
+}
+function sendMessage(){
+ const value=$('message').value.trim();if(!value||!activeRoom)return;
+ activeRoom.messages.push({who:'Gracz 1',text:value,type:'me'});
+ $('message').value='';persist();renderChat();
+}
+function renderChat(){
+ $('chatbox').innerHTML=activeRoom.messages.map(m=>`<div class="message ${m.type==='ai'?'ai':'me'}"><div class="who">${esc(m.who)}</div>${esc(m.text)}</div>`).join('');
+ $('chatbox').scrollTop=$('chatbox').scrollHeight;
+}
+function aiTurn(){
+ if(!activeRoom)return;
+ const npc=activeRoom.npcs[0];
+ const name=npc?npc.name:'Narrator';
+ const last=activeRoom.messages.at(-1);
+ const response=last
+ ? `To demonstracyjna odpowiedź AI. ${name} reaguje na wydarzenia: "${last.text}". Po podłączeniu modelu AI będzie generować oryginalną kontynuację fabuły.`
+ : 'W pomieszczeniu zapada cisza. Narrator czeka na rozpoczęcie historii przez graczy.';
+ activeRoom.messages.push({who:name,text:response,type:'ai'});
+ persist();renderChat();
+}
+function createCharacter(){
+ const name=$('charName').value.trim();if(!name)return alert('Podaj imię');
+ data.characters.push({name,owner:$('charOwner').value,desc:$('charDesc').value,history:$('charHistory').value});
+ persist();renderCharacters();$('charName').value='';$('charDesc').value='';$('charHistory').value='';
+}
+function renderCharacters(){
+ $('characterList').innerHTML=data.characters.map(c=>`<div class="card"><h3>♙ ${esc(c.name)}</h3><span class="pill">${esc(c.owner)}</span><p>${esc(c.desc)}</p><p class="muted">${esc(c.history)}</p></div>`).join('')||'<p class="muted">Brak postaci.</p>';
+}
+function createWorld(){
+ const name=$('worldName').value.trim();if(!name)return alert('Podaj nazwę świata');
+ data.worlds.push({name,genre:$('worldGenre').value,desc:$('worldDesc').value});
+ persist();renderWorlds();$('worldName').value='';$('worldDesc').value='';
+}
+function renderWorlds(){
+ $('worldList').innerHTML=data.worlds.map(w=>`<div class="card"><h3>✧ ${esc(w.name)}</h3><span class="pill">${esc(w.genre)}</span><p>${esc(w.desc)}</p></div>`).join('')||'<p class="muted">Nie utworzono jeszcze światów.</p>';
+}
+function saveSettings(){
+ data.settings={personality:$('aiPersonality').value,length:$('aiLength').value,rules:$('aiRules').value};
+ persist();alert('Zapisano ustawienia!');
+}
+function saveMemory(){
+ if(!activeRoom)return;activeRoom.memory=$('memory').value;persist();alert('Pamięć zapisana!');
+}
+function addNPC(){
+ if(!activeRoom)return;
+ const name=$('npcName').value.trim();if(!name)return alert('Podaj imię NPC');
+ activeRoom.npcs.push({name,desc:$('npcDesc').value});
+ $('npcName').value='';$('npcDesc').value='';persist();renderNPC();
+}
+function renderNPC(){
+ $('npcList').innerHTML='Narrator'+activeRoom.npcs.map(n=>'<p>♙ '+esc(n.name)+' — '+esc(n.desc)+'</p>').join('');
+}
+function esc(s){
+ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+renderHome();renderRooms();renderCharacters();renderWorlds();
+</script>
+</body>
+</html>
