@@ -253,26 +253,58 @@ function openRoom(id){
  $('memory').value=activeRoom.memory||'';renderChat();renderNPC();
  page('play');
 }
-function sendMessage(){
- const value=$('message').value.trim();if(!value||!activeRoom)return;
- activeRoom.messages.push({who:'Gracz 1',text:value,type:'me'});
- $('message').value='';persist();renderChat();
+
+async function sendMessage(){
+ const value=$('message').value.trim();
+ if(!value||!activeRoom)return;
+
+ activeRoom.messages.push({
+   who:'Gracz 1',
+   text:value,
+   type:'me'
+ });
+
+ $('message').value='';
+ persist();
+ renderChat();
+
+ const history=activeRoom.messages
+   .slice(-11,-1)
+   .map(m=>({
+     role:m.type==='ai'?'assistant':'user',
+     content:m.text
+   }));
+
+ try {
+   const {data:result,error}=await supabaseClient.functions.invoke(
+     'rp-narrator',
+     {
+       body:{
+         message:value,
+         history,
+         mode:activeRoom.mode==='adult'?'adult':'standard'
+       }
+     }
+   );
+
+   if(error) throw error;
+   if(!result?.reply) throw new Error('Narrator nie zwrócił odpowiedzi.');
+
+   activeRoom.messages.push({
+     who:'Narrator',
+     text:result.reply,
+     type:'ai'
+   });
+
+   persist();
+   renderChat();
+
+ } catch(error) {
+   console.error('Błąd narratora:',error);
+   alert('Nie udało się połączyć z narratorem AI. Sprawdź połączenie i spróbuj ponownie.');
+ }
 }
-function renderChat(){
- $('chatbox').innerHTML=activeRoom.messages.map(m=>`<div class="message ${m.type==='ai'?'ai':'me'}"><div class="who">${esc(m.who)}</div>${esc(m.text)}</div>`).join('');
- $('chatbox').scrollTop=$('chatbox').scrollHeight;
-}
-function aiTurn(){
- if(!activeRoom)return;
- const npc=activeRoom.npcs[0];
- const name=npc?npc.name:'Narrator';
- const last=activeRoom.messages.at(-1);
- const response=last
- ? `To demonstracyjna odpowiedź AI. ${name} reaguje na wydarzenia: "${last.text}". Po podłączeniu modelu AI będzie generować oryginalną kontynuację fabuły.`
- : 'W pomieszczeniu zapada cisza. Narrator czeka na rozpoczęcie historii przez graczy.';
- activeRoom.messages.push({who:name,text:response,type:'ai'});
- persist();renderChat();
-}
+
 function createCharacter(){
  const name=$('charName').value.trim();if(!name)return alert('Podaj imię');
  data.characters.push({name,owner:$('charOwner').value,desc:$('charDesc').value,history:$('charHistory').value});
