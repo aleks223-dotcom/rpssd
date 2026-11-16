@@ -288,10 +288,6 @@ function esc(s){
  return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 renderHome();renderRooms();renderCharacters();renderWorlds();
- renderHome();
-renderRooms();
-renderCharacters();
-renderWorlds();
 
 // Połączenie z Supabase
 const SUPABASE_URL = 'https://zjonahbhzroqcqnofqeg.supabase.co';
