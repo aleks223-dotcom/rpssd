@@ -377,7 +377,7 @@ async function loginUser() {
     }
 
     document.getElementById('authScreen').style.display = 'none';
-    document.querySelector('.app').style.display = 'block';
+    document.querySelector('.app').style.display = 'grid;
 }
 
 // Sprawdzenie, czy użytkownik jest już zalogowany
@@ -390,7 +390,7 @@ async function checkLogin() {
 
     const loggedIn = !!data?.session;
     document.getElementById('authScreen').style.display = loggedIn ? 'none' : 'flex';
-    document.querySelector('.app').style.display = loggedIn ? 'block' : 'none';
+    document.querySelector('.app').style.display = loggedIn ? 'grid' : 'none';
 }
 
 checkLogin();
