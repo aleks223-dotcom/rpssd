@@ -78,6 +78,26 @@ label{font-size:13px;color:var(--muted)}
 </head>
 <body>
 <div class="app">
+  
+<div id="authScreen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#100d1c;color:white;font-family:Arial,sans-serif;padding:20px;box-sizing:border-box;">
+  <div style="width:100%;max-width:380px;background:#1d1830;padding:30px;border-radius:18px;box-sizing:border-box;">
+    <h1 style="text-align:center;color:#c4a5ff;">✦ RP Universe</h1>
+    <p style="text-align:center;color:#c5bdd8;">Zaloguj się lub utwórz konto</p>
+
+    <label for="authEmail">Adres e-mail</label>
+    <input id="authEmail" type="email" placeholder="Twój e-mail" style="width:100%;padding:12px;margin:8px 0 16px;box-sizing:border-box;border-radius:8px;">
+
+    <label for="authPassword">Hasło</label>
+    <input id="authPassword" type="password" placeholder="Hasło (minimum 6 znaków)" style="width:100%;padding:12px;margin:8px 0 16px;box-sizing:border-box;border-radius:8px;">
+
+    <button onclick="registerUser()" style="width:100%;padding:13px;background:#8b5cf6;color:white;border:0;border-radius:8px;margin-bottom:10px;cursor:pointer;">Utwórz konto</button>
+
+    <button onclick="loginUser()" style="width:100%;padding:13px;background:#35294f;color:white;border:0;border-radius:8px;cursor:pointer;">Zaloguj się</button>
+
+    <p id="authMessage" style="text-align:center;margin-top:16px;color:#d8c8ff;"></p>
+  </div>
+</div>
+
 <aside>
  <div class="logo">✦ RP <span>UNIVERSE</span></div>
  <div class="nav">
@@ -301,6 +321,78 @@ const supabaseClient = window.supabase.createClient(
 );
 
 console.log('Supabase client utworzony:', !!supabaseClient);
+
+// Rejestracja nowego użytkownika
+async function registerUser() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const message = document.getElementById('authMessage');
+
+    if (!email || !password) {
+        message.textContent = 'Wpisz e-mail i hasło.';
+        return;
+    }
+
+    if (password.length < 6) {
+        message.textContent = 'Hasło musi mieć co najmniej 6 znaków.';
+        return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+            emailRedirectTo: window.location.origin + window.location.pathname
+        }
+    });
+
+    if (error) {
+        message.textContent = 'Błąd: ' + error.message;
+        return;
+    }
+
+    message.textContent = 'Konto utworzone! Sprawdź pocztę i potwierdź adres e-mail.';
+}
+
+// Logowanie istniejącego użytkownika
+async function loginUser() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const message = document.getElementById('authMessage');
+
+    if (!email || !password) {
+        message.textContent = 'Wpisz e-mail i hasło.';
+        return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
+
+    if (error) {
+        message.textContent = 'Błąd logowania: ' + error.message;
+        return;
+    }
+
+    document.getElementById('authScreen').style.display = 'none';
+    document.querySelector('.app').style.display = 'block';
+}
+
+// Sprawdzenie, czy użytkownik jest już zalogowany
+async function checkLogin() {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+        console.error('Błąd sprawdzania sesji:', error.message);
+    }
+
+    const loggedIn = !!data?.session;
+    document.getElementById('authScreen').style.display = loggedIn ? 'none' : 'flex';
+    document.querySelector('.app').style.display = loggedIn ? 'block' : 'none';
+}
+
+checkLogin();
 
 </script>
 
