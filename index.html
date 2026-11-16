@@ -253,7 +253,13 @@ function openRoom(id){
  $('memory').value=activeRoom.memory||'';renderChat();renderNPC();
  page('play');
 }
-
+function renderChat(){
+ $('chatbox').innerHTML=activeRoom.messages.map(m=>
+ `<div class="message ${m.type==='ai'?'ai':'me'}">
+ <div class="who">${esc(m.who)}</div>${esc(m.text)}</div>`
+ ).join('');
+ $('chatbox').scrollTop=$('chatbox').scrollHeight;
+}
 async function sendMessage(){
  const value=$('message').value.trim();
  if(!value||!activeRoom)return;
